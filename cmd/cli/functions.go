@@ -1,4 +1,5 @@
 package cli
+
 //COMPLETE
 import (
 	"encoding/json"
@@ -8,16 +9,16 @@ import (
 	"github.com/sashabaranov/go-openai/jsonschema"
 )
 
-//name for the schema of kubernetes resource, defining the struct here
-//and methods for the struct below
+// name for the schema of kubernetes resource, defining the struct here
+// and methods for the struct below
 type schemaNames struct {
 	ResourceName string `json:"resourceName"`
 }
 
-//defining findSchemaNames as an openAI functionDefiniion
-//we pass this function when we make a chat completion request to openai in openai.go file
-//open ai package is available to us as openai due to named import
-//we are defining these as variables that are of type openai function definition
+// defining findSchemaNames as an openAI functionDefiniion
+// we pass this function when we make a chat completion request to openai in openai.go file
+// open ai package is available to us as openai due to named import
+// we are defining these as variables that are of type openai function definition
 var findSchemaNames openai.FunctionDefinition = openai.FunctionDefinition{
 	Name:        "findSchemaNames",
 	Description: "Get the list of possible fully-namespaced names for a specific Kubernetes resource. E.g. given `Container` return `io.k8s.api.core.v1.Container`. Given `EnvVarSource` return `io.k8s.api.core.v1.EnvVarSource`",
@@ -39,7 +40,7 @@ var findSchemaNames openai.FunctionDefinition = openai.FunctionDefinition{
 }
 
 // Run fetches resource names based on the provided resource name and returns them as a string.
-//being called in the funcCall function below
+// being called in the funcCall function below
 func (s *schemaNames) Run() (content string, err error) {
 	// Fetch resource names
 	//s is a struct with field ResourceName and that's what we're accessing here
@@ -54,9 +55,8 @@ func (s *schemaNames) Run() (content string, err error) {
 	return strings.Join(names, "\n"), nil
 }
 
-
-//just like we defined schema for kubernertes resource name, this one is for
-//resource type of kubernetes
+// just like we defined schema for kubernertes resource name, this one is for
+// resource type of kubernetes
 type schema struct {
 	ResourceType string `json:"resourceType"`
 }
@@ -97,8 +97,8 @@ func (s *schema) Run() (content string, err error) {
 
 // funcCall is a function that handles different function calls based on the provided call name.
 // It takes a pointer to an openai.FunctionCall as input and returns a string and an error.
-//we call this function from openai.go file in the chatCompletion function, when we have received response
-//from open ai and want to implement the function received in response
+// we call this function from openai.go file in the chatCompletion function, when we have received response
+// from open ai and want to implement the function received in response
 func funcCall(call *openai.FunctionCall) (string, error) {
 	switch call.Name {
 	case findSchemaNames.Name:
