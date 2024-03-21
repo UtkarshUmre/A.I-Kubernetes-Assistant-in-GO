@@ -21,8 +21,8 @@ import (
 
 const defaultNamespace = "default"
 
-//completion string received here is the yaml file returned by chatgptcompletion api
-//we are calling this functin from root.go after asking the user whether he wants to apply
+// completion string received here is the yaml file returned by chatgptcompletion api
+// we are calling this functin from root.go after asking the user whether he wants to apply
 // applyManifest applies the provided manifest to the Kubernetes cluster.
 func applyManifest(completion string) error {
 	// Retrieve the Kubernetes configuration file path, just returns the file path
@@ -43,7 +43,7 @@ func applyManifest(completion string) error {
 	}
 
 	// Create a dynamic client for working with unstructured objects
-	//The dynamic package in Kubernetes client libraries (like client-go in Go) provides a client for working with arbitrary resources in a dynamic fashion. 
+	//The dynamic package in Kubernetes client libraries (like client-go in Go) provides a client for working with arbitrary resources in a dynamic fashion.
 	//Instead of using a strongly typed client for each specific resource (e.g., Pods, Services), the dynamic client allows you to interact with resources without knowing their types at compile time.
 	dd, err := dynamic.NewForConfig(config)
 	if err != nil {
@@ -85,24 +85,24 @@ func applyManifest(completion string) error {
 
 	// Decode and apply each object in the manifest
 	for {
-		//runtime.RawExtension is a type provided by the Kubernetes client libraries. 
-		//It is used to represent arbitrary JSON or yaml data without unmarshaling it into a specific struct. 
+		//runtime.RawExtension is a type provided by the Kubernetes client libraries.
+		//It is used to represent arbitrary JSON or yaml data without unmarshaling it into a specific struct.
 		//This can be useful in situations where you want to work with Kubernetes resources that have dynamic or unknown structures.
 		var rawObj runtime.RawExtension
 		//decoder already has the manifest file, we want to structure it like rawObj
 		//and decode it into the rawObj variable, since we don't know the structure of the JSON data
 		//at compile time, so need RawExtension, we will further process rawObj now
-		
+
 		if err = decoder.Decode(&rawObj); err != nil {
 			break
 		}
 
 		// Decode the raw object into a typed object using the YAML decoding serializer
-		//here obj is the decoded object for data that was stored in rawObj 
+		//here obj is the decoded object for data that was stored in rawObj
 		//we basically created a new yaml decodingSerializer to process JSON data into something golang understands
 		obj, gvk, err := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(rawObj.Raw, nil, nil)
 		//gvk is groupVersionKind data of the decoded object, provides info about the API group, version and kind of the resource
-		
+
 		if err != nil {
 			return err
 		}
@@ -140,20 +140,20 @@ func applyManifest(completion string) error {
 
 		//we need a dynamic resource interfece and dri is a short form for it
 		//This variable is intended to represent an interface for interacting with dynamic (untyped) Kubernetes resources.
-//This interface defines methods for performing CRUD (Create, Read, Update, Delete) operations on Kubernetes resources without requiring a statically generated client for each specific resource type.
-		
+		//This interface defines methods for performing CRUD (Create, Read, Update, Delete) operations on Kubernetes resources without requiring a statically generated client for each specific resource type.
+
 		var dri dynamic.ResourceInterface
 		//mapping has the REST mapping available and we're checking if the namespace matches
 
-//In Kubernetes, a namespace is a way to divide cluster resources between multiple users (via resource units like pods, services, etc.). 
-//It provides a scope for names, meaning that names of resources must be unique within a namespace, but they can be repeated across namespaces.
-//A "namespace scope" in the context of your code refers to whether a particular Kubernetes resource is bound within the context of a namespace. 
-//When a resource is namespace-scoped, it means that it exists within a specific namespace, and operations on that resource are limited to that namespace.
-		
-//This code checks whether the resource represented by mapping is namespace-scoped.
-//meta.RESTScopeNameNamespace refers to a constant value defined in the k8s.io/apimachinery/pkg/api/meta package of the Kubernetes Go client library. 
-//This constant represents the string identifier for the namespace scope of a Kubernetes resource.
-if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
+		//In Kubernetes, a namespace is a way to divide cluster resources between multiple users (via resource units like pods, services, etc.).
+		//It provides a scope for names, meaning that names of resources must be unique within a namespace, but they can be repeated across namespaces.
+		//A "namespace scope" in the context of your code refers to whether a particular Kubernetes resource is bound within the context of a namespace.
+		//When a resource is namespace-scoped, it means that it exists within a specific namespace, and operations on that resource are limited to that namespace.
+
+		// This code checks whether the resource represented by mapping is namespace-scoped.
+		// meta.RESTScopeNameNamespace refers to a constant value defined in the k8s.io/apimachinery/pkg/api/meta package of the Kubernetes Go client library.
+		// This constant represents the string identifier for the namespace scope of a Kubernetes resource.
+		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 			// check if namespace for unstructured obj is empty,
 			//set the namespace if not already set
 			if unstructuredObj.GetNamespace() == "" {
@@ -174,8 +174,8 @@ if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 			return err
 		}
 	}
-//this function applies manifest and doesn't return any value, just an error,
-//so if everything went well, we'll return nil as the error
+	//this function applies manifest and doesn't return any value, just an error,
+	//so if everything went well, we'll return nil as the error
 	return nil
 }
 
@@ -183,7 +183,6 @@ if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 func getKubeConfig() string {
 	var kubeConfig string
 
-	
 	//usually you'd find the config file in home directory in the path ~/.kube/config
 	//but you might have a separate kubeConfig, if you don't have it or
 	// If the KubeConfig flag is not set, use the default path: ~/.kube/config.
@@ -214,11 +213,11 @@ func getConfig(kubeConfig string) (api.Config, error) {
 	return config, nil
 }
 
-//we are calling this function in the root.go file and we need the context to be able
-//to apply the manifest settings
+// we are calling this function in the root.go file and we need the context to be able
+// to apply the manifest settings
 // getCurrentContextName returns the name of the current context in the Kubernetes configuration.
-//first we will call the getKubeConfig func. to get the config file
-//then we call getConfig func. to retrieve the actual kube config from the file
+// first we will call the getKubeConfig func. to get the config file
+// then we call getConfig func. to retrieve the actual kube config from the file
 func getCurrentContextName() (string, error) {
 	// getKubeConfig retrieves the path to the Kubernetes configuration file.
 	kubeConfig := getKubeConfig()
